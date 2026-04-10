@@ -1,0 +1,657 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>22 Hale Street Heritage Centre | Ipoh's Living Memory</title>
+<meta name="description" content="Discover Ipoh's rich tin mining heritage at 22 Hale Street Heritage Centre. Book guided tours, explore exhibitions, and immerse yourself in Perak's storied past."/>
+<meta name="keywords" content="Ipoh Heritage Museum, 22 Hale Street, Things to do in Ipoh, Perak Tin Mining History, Ipoh history, Malaysian heritage"/>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400;1,600&family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;1,300;1,400&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet"/>
+<link rel="stylesheet" href="style.css"/>
+</head>
+<body>
+
+<div id="cursorDot"></div>
+<div id="cursorRing"></div>
+
+<!-- ============================================================
+     AMBIENT CANVAS — sits behind hero content
+     ============================================================ -->
+<canvas id="heroCanvas"></canvas>
+
+<!-- ============================================================
+     SEARCH OVERLAY (new — Louvre/Met/British Museum all have this)
+     ============================================================ -->
+<div id="searchOverlay" role="dialog" aria-label="Search" aria-modal="true">
+  <button class="search-close" onclick="closeSearch()" aria-label="Close search">×</button>
+  <div class="search-inner">
+    <p class="search-eyebrow">Search the Collection</p>
+    <input
+      type="search"
+      class="search-input"
+      data-i18n-placeholder="searchPlaceholder"
+      placeholder="Search exhibitions, artifacts, stories…"
+      onkeydown="if(event.key==='Enter'){showToast('Search coming soon!');closeSearch();}"
+    />
+    <p class="search-hint">Try: "tin mining", "Hakka", "1920s architecture"</p>
+  </div>
+</div>
+
+<!-- ============================================================
+     MOBILE NAV
+     ============================================================ -->
+<div class="mob-nav" id="mobNav" role="navigation" aria-label="Mobile navigation">
+  <a href="#museum"   onclick="closeMob()" data-i18n="navMuseum">The Museum</a>
+  <a href="#gallery"  onclick="closeMob()" data-i18n="navGallery">Gallery</a>
+  <a href="#timeline" onclick="closeMob()" data-i18n="navHistory">History</a>
+  <a href="#events"   onclick="closeMob()" data-i18n="navEvents">Events</a>
+  <a href="#visit"    onclick="closeMob()" data-i18n="navVisit">Visit</a>
+  <a href="#shop"     onclick="closeMob()" data-i18n="navShop">Shop</a>
+  <a href="#blog"     onclick="closeMob()" data-i18n="navStories">Stories</a>
+  <div class="mob-lang">
+    <!-- FIX: Added data-lang attribute so switchLang() can identify
+         which language each button represents without parsing onclick text -->
+    <button class="lang-btn active" data-lang="en" onclick="switchLang('en')">EN</button>
+    <button class="lang-btn"        data-lang="ms" onclick="switchLang('ms')">BM</button>
+    <button class="lang-btn"        data-lang="zh" onclick="switchLang('zh')">中</button>
+  </div>
+</div>
+
+<!-- ============================================================
+     NAVIGATION
+     ============================================================ -->
+<nav id="mainNav" role="navigation" aria-label="Main navigation">
+  <a href="#" class="nav-logo" aria-label="22 Hale Street Heritage Centre — Home">
+    <img src="logo.png" alt="22 Hale Street Heritage Centre"
+         onerror="this.style.display='none'; document.getElementById('logoFallback').style.display='flex'"/>
+    <div id="logoFallback" class="nav-logo-fallback" style="display:none">
+      <span class="logo-num">22</span>
+      <span class="logo-sub">Hale Street · Heritage Centre</span>
+    </div>
+  </a>
+  <div class="nav-right">
+    <ul class="nav-links">
+      <li><a href="#museum"   data-i18n="navMuseum">Museum</a></li>
+      <li><a href="#timeline" data-i18n="navHistory">History</a></li>
+      <li><a href="#events"   data-i18n="navEvents">Events</a></li>
+      <li><a href="#visit"    data-i18n="navVisit">Visit</a></li>
+      <li><a href="#shop"     data-i18n="navShop">Shop</a></li>
+      <li><a href="#blog"     data-i18n="navStories">Stories</a></li>
+    </ul>
+    <!-- Search button (new) -->
+    <button class="nav-search-btn" onclick="openSearch()" aria-label="Open search">
+      <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round">
+        <circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/>
+      </svg>
+    </button>
+    <div class="lang-switcher">
+      <button class="lang-btn active" data-lang="en" onclick="switchLang('en')">EN</button>
+      <span class="lang-sep">|</span>
+      <button class="lang-btn" data-lang="ms" onclick="switchLang('ms')">BM</button>
+      <span class="lang-sep">|</span>
+      <button class="lang-btn" data-lang="zh" onclick="switchLang('zh')">中</button>
+    </div>
+    <button class="nav-book" onclick="openModal()" data-i18n="navBook">Book a Tour</button>
+  </div>
+  <button class="nav-ham" onclick="toggleMob()" aria-label="Toggle mobile navigation" aria-expanded="false">
+    <span></span><span></span><span></span>
+  </button>
+</nav>
+
+<!-- ============================================================
+     HERO
+     ============================================================ -->
+<section id="hero" aria-label="Hero">
+  <div class="hero-arch" aria-hidden="true">
+    <svg viewBox="0 0 600 700" xmlns="http://www.w3.org/2000/svg" fill="none">
+      <rect x="80"  y="150" width="440" height="550" fill="rgba(201,168,76,.28)" stroke="rgba(201,168,76,.45)" stroke-width="1"/>
+      <rect x="100" y="200" width="18"  height="500" fill="rgba(201,168,76,.18)"/>
+      <rect x="200" y="200" width="18"  height="500" fill="rgba(201,168,76,.18)"/>
+      <rect x="300" y="200" width="18"  height="500" fill="rgba(201,168,76,.18)"/>
+      <rect x="400" y="200" width="18"  height="500" fill="rgba(201,168,76,.18)"/>
+      <rect x="480" y="200" width="18"  height="500" fill="rgba(201,168,76,.18)"/>
+      <path d="M100,220 Q110,200 120,220" stroke="rgba(201,168,76,.5)" stroke-width="1.5" fill="none"/>
+      <path d="M200,220 Q210,200 220,220" stroke="rgba(201,168,76,.5)" stroke-width="1.5" fill="none"/>
+      <path d="M300,220 Q310,200 320,220" stroke="rgba(201,168,76,.5)" stroke-width="1.5" fill="none"/>
+      <path d="M400,220 Q410,200 420,220" stroke="rgba(201,168,76,.5)" stroke-width="1.5" fill="none"/>
+      <rect x="130" y="250" width="48" height="68" fill="none" stroke="rgba(201,168,76,.38)" stroke-width="1"/>
+      <rect x="230" y="250" width="48" height="68" fill="none" stroke="rgba(201,168,76,.38)" stroke-width="1"/>
+      <rect x="330" y="250" width="48" height="68" fill="none" stroke="rgba(201,168,76,.38)" stroke-width="1"/>
+      <rect x="430" y="250" width="48" height="68" fill="none" stroke="rgba(201,168,76,.38)" stroke-width="1"/>
+      <path d="M120,700 L120,500 Q155,460 190,500 L190,700" fill="rgba(201,168,76,.14)" stroke="rgba(201,168,76,.38)" stroke-width="1"/>
+      <path d="M220,700 L220,500 Q255,460 290,500 L290,700" fill="rgba(201,168,76,.14)" stroke="rgba(201,168,76,.38)" stroke-width="1"/>
+      <path d="M320,700 L320,500 Q355,460 390,500 L390,700" fill="rgba(201,168,76,.14)" stroke="rgba(201,168,76,.38)" stroke-width="1"/>
+      <path d="M420,700 L420,500 Q455,460 490,500 L490,700" fill="rgba(201,168,76,.14)" stroke="rgba(201,168,76,.38)" stroke-width="1"/>
+      <path d="M60,155 L300,80 L540,155 L540,170 L60,170 Z" fill="none" stroke="rgba(201,168,76,.45)" stroke-width="1.5"/>
+      <text x="300" y="133" text-anchor="middle" font-family="Georgia" font-size="26" fill="rgba(201,168,76,.65)">22</text>
+      <line x1="80"  y1="190" x2="520" y2="190" stroke="rgba(201,168,76,.35)" stroke-width=".5"/>
+      <line x1="80"  y1="370" x2="520" y2="370" stroke="rgba(201,168,76,.22)" stroke-width=".5"/>
+    </svg>
+  </div>
+  <div class="hero-vignette" aria-hidden="true"></div>
+  <div class="hero-grid"     aria-hidden="true"></div>
+
+  <div class="hero-content">
+    <p  class="hero-eyebrow" data-i18n="heroEye">Ipoh · Perak · Malaysia · Est. 1920s</p>
+    <h1 class="hero-title"   data-i18n="heroTitle">Where Ipoh's <em>Soul Lives On</em></h1>
+    <div class="hero-divider" aria-hidden="true">
+      <div class="hero-divider-line"></div>
+      <div class="hero-divider-dot"></div>
+      <div class="hero-divider-line"></div>
+    </div>
+    <p class="hero-desc" data-i18n="heroDesc">Step inside one of Ipoh's finest Edwardian shophouses. A living archive of tin mining glory, immigrant stories, and the making of modern Perak.</p>
+    <div class="hero-actions">
+      <a href="#visit"  class="btn-gold"         data-i18n="heroCta1">Plan Your Visit</a>
+      <a href="#museum" class="btn-outline-light" data-i18n="heroCta2">Explore Museum</a>
+    </div>
+  </div>
+
+  <div class="info-bar" role="complementary" aria-label="Quick visitor information">
+    <div class="info-item">
+      <span class="info-label" data-i18n="iHrsL">Open Hours</span>
+      <span class="info-value" data-i18n="iHrsV">Wed – Sun, 10am – 6pm</span>
+    </div>
+    <div class="info-item">
+      <span class="info-label" data-i18n="iAdrL">Address</span>
+      <span class="info-value" data-i18n="iAdrV">22-24, Jalan Tun Sambanthan, 30000 Ipoh, Perak, Malaysia.</span>
+    </div>
+    <div class="info-item">
+      <span class="info-label" data-i18n="iAdmL">Admission</span>
+      <span class="info-value" data-i18n="iAdmV">RM 15 per person</span>
+    </div>
+    <div class="info-item">
+      <span class="info-label" data-i18n="iTrL">Guided Tours</span>
+      <span class="info-value" data-i18n="iTrV">Daily 10am &amp; 2pm</span>
+    </div>
+  </div>
+</section>
+
+<!-- ============================================================
+     STATS STRIP
+     NOTE: Added data-count / data-suffix for the JS counter animation.
+     The textContent is kept as the fallback if JS hasn't fired yet.
+     ============================================================ -->
+<div id="strip" aria-label="Museum at a glance">
+  <div class="strip-item reveal">
+    <div class="strip-num" data-count="100" data-suffix="+" data-i18n="s1n">100+</div>
+    <div class="strip-desc" data-i18n="s1d">Years of history preserved</div>
+  </div>
+  <div class="strip-div" aria-hidden="true"></div>
+  <div class="strip-item reveal reveal-d1">
+    <div class="strip-num" data-count="3500" data-suffix="+" data-i18n="s2n">3,500+</div>
+    <div class="strip-desc" data-i18n="s2d">Artifacts in our collection</div>
+  </div>
+  <div class="strip-div" aria-hidden="true"></div>
+  <div class="strip-item reveal reveal-d2">
+    <div class="strip-num" data-count="5" data-suffix="" data-i18n="s3n">5</div>
+    <div class="strip-desc" data-i18n="s3d">Exhibition floors to explore</div>
+  </div>
+</div>
+
+<!-- ============================================================
+     MUSEUM
+     ============================================================ -->
+<section id="museum" aria-labelledby="musHeading">
+  <div class="museum-grid">
+    <div>
+      <div class="sec-label reveal" data-i18n="musLbl">The Museum</div>
+      <h2 id="musHeading" class="sec-title reveal reveal-d1" data-i18n="musTitle">A Century of<em> Stories</em></h2>
+      <div class="ornament reveal reveal-d2" aria-hidden="true">
+        <div class="ornament-line"></div>
+        <div class="ornament-diamond"></div>
+        <div class="ornament-line"></div>
+      </div>
+      <p class="sec-body reveal reveal-d2" data-i18n="musP1">
+        From the feverish tin rush of the 1880s to the cultural tapestry woven by Hakka miners, British colonists, and Sikh immigrants — 22 Hale Street holds the memories this city was built upon.
+      </p>
+      <p class="sec-body reveal reveal-d3" style="margin-top:1rem" data-i18n="musP2">
+        Our restored Edwardian shophouse spans five floors of permanent and rotating collections, each room a doorway into a different chapter of Ipoh's remarkable becoming.
+      </p>
+      <div style="margin-top:2.2rem" class="reveal reveal-d3">
+        <a href="#visit" class="btn-gold" data-i18n="musCta">Book a Guided Tour</a>
+      </div>
+    </div>
+    <div class="card-stack">
+      <div class="museum-card reveal">
+        <div class="card-icon" aria-hidden="true">⛏️</div>
+        <div class="card-title" data-i18n="c1t">Tin Mining Gallery</div>
+        <div class="card-body"  data-i18n="c1b">Dulang washers, dredges, and the tools of an empire built underground. Explore the complete story of Larut and Kinta's tin era.</div>
+        <a href="#" class="card-link" data-i18n="c1l">Explore gallery</a>
+      </div>
+      <div class="museum-card reveal reveal-d1">
+        <div class="card-icon" aria-hidden="true">🏛️</div>
+        <div class="card-title" data-i18n="c2t">Edwardian Architecture</div>
+        <div class="card-body"  data-i18n="c2b">The building itself is a masterpiece — ornate plasterwork, original teak floors, and five-foot ways that whisper of another century.</div>
+        <a href="#gallery" class="card-link" data-i18n="c2l">Take virtual tour</a>
+      </div>
+      <div class="museum-card reveal reveal-d2">
+        <div class="card-icon" aria-hidden="true">🪔</div>
+        <div class="card-title" data-i18n="c3t">Community Voices</div>
+        <div class="card-body"  data-i18n="c3b">Oral histories, family photographs, and personal objects donated by Ipoh's oldest families. Every artifact carries a name.</div>
+        <a href="#" class="card-link" data-i18n="c3l">Hear the stories</a>
+      </div>
+      <div class="museum-card reveal reveal-d3">
+        <div class="card-icon" aria-hidden="true">🎨</div>
+        <div class="card-title" data-i18n="c4t">Rotating Exhibitions</div>
+        <div class="card-body"  data-i18n="c4b">Contemporary Malaysian artists respond to heritage. Our programme bridges the historical and the living, the archival and the urgent.</div>
+        <a href="#events" class="card-link" data-i18n="c4l">Current exhibitions</a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============================================================
+     GALLERY
+     ============================================================ -->
+<section id="gallery" aria-labelledby="galHeading">
+  <div class="gallery-header">
+    <div class="sec-label reveal" data-i18n="galLbl">Virtual Gallery</div>
+    <h2 id="galHeading" class="sec-title reveal reveal-d1" data-i18n="galTitle">See Before You <em>Visit</em></h2>
+  </div>
+  <div class="gallery-track" id="galTrack" aria-label="Scrolling image gallery">
+    <!-- Set 1 -->
+    <div class="gallery-item">
+      <svg viewBox="0 0 400 300" xmlns="http://www.w3.org/2000/svg"><defs><linearGradient id="ga" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stop-color="#0d3b3e"/><stop offset="100%" stop-color="#1a5c62"/></linearGradient></defs><rect width="400" height="300" fill="url(#ga)"/><rect x="30" y="40" width="340" height="220" fill="none" stroke="rgba(201,168,76,.3)" stroke-width="1"/><circle cx="200" cy="120" r="50" fill="none" stroke="rgba(201,168,76,.4)" stroke-width="1"/><line x1="150" y1="120" x2="250" y2="120" stroke="rgba(201,168,76,.3)" stroke-width="1"/><line x1="200" y1="70" x2="200" y2="170" stroke="rgba(201,168,76,.3)" stroke-width="1"/><text x="200" y="210" text-anchor="middle" font-family="Georgia" font-size="13" fill="rgba(201,168,76,.6)" font-style="italic">Dulang Washing Basin</text></svg>
+      <div class="gallery-tag">Collection</div>
+      <div class="gallery-caption">A dulang washing basin used by early miners in the Kinta Valley</div>
+    </div>
+    <div class="gallery-item">
+      <svg viewBox="0 0 400 300" xmlns="http://www.w3.org/2000/svg"><defs><linearGradient id="gb" x1="0%" y1="100%" x2="100%" y2="0%"><stop offset="0%" stop-color="#2a1f14"/><stop offset="100%" stop-color="#6b3e26"/></linearGradient></defs><rect width="400" height="300" fill="url(#gb)"/><rect x="100" y="30" width="200" height="240" fill="none" stroke="rgba(201,168,76,.4)" stroke-width="1.5"/><text x="200" y="110" text-anchor="middle" font-family="Georgia" font-size="22" fill="rgba(201,168,76,.5)" font-style="italic">22</text><text x="200" y="212" text-anchor="middle" font-family="Georgia" font-size="12" fill="rgba(201,168,76,.6)" font-style="italic">The Shophouse Facade</text></svg>
+      <div class="gallery-tag">Architecture</div>
+      <div class="gallery-caption">The Edwardian facade of 22 Hale Street, meticulously restored</div>
+    </div>
+    <div class="gallery-item">
+      <svg viewBox="0 0 400 300" xmlns="http://www.w3.org/2000/svg"><defs><linearGradient id="gc" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stop-color="#1c1c1c"/><stop offset="100%" stop-color="#0d3b3e"/></linearGradient></defs><rect width="400" height="300" fill="url(#gc)"/><g transform="translate(200,125)"><polygon points="0,-68 58,34 -58,34" fill="none" stroke="rgba(201,168,76,.5)" stroke-width="1.5"/><circle cx="0" cy="0" r="24" fill="rgba(201,168,76,.1)" stroke="rgba(201,168,76,.4)" stroke-width="1"/><circle cx="0" cy="0" r="9" fill="rgba(201,168,76,.2)"/></g><text x="200" y="218" text-anchor="middle" font-family="Georgia" font-size="13" fill="rgba(201,168,76,.6)" font-style="italic">Miner's Lamp · c.1910</text></svg>
+      <div class="gallery-tag">Artifact</div>
+      <div class="gallery-caption">An oil lamp carried by underground miners in the Kinta Valley</div>
+    </div>
+    <div class="gallery-item">
+      <svg viewBox="0 0 400 300" xmlns="http://www.w3.org/2000/svg"><defs><linearGradient id="gd" x1="100%" y1="0%" x2="0%" y2="100%"><stop offset="0%" stop-color="#1a5c62"/><stop offset="100%" stop-color="#0d3b3e"/></linearGradient></defs><rect width="400" height="300" fill="url(#gd)"/><rect x="60" y="50" width="280" height="200" rx="2" fill="none" stroke="rgba(201,168,76,.3)" stroke-width="1"/><line x1="60" y1="100" x2="340" y2="100" stroke="rgba(201,168,76,.15)" stroke-width=".5"/><line x1="60" y1="150" x2="340" y2="150" stroke="rgba(201,168,76,.15)" stroke-width=".5"/><line x1="150" y1="50" x2="150" y2="250" stroke="rgba(201,168,76,.15)" stroke-width=".5"/><line x1="250" y1="50" x2="250" y2="250" stroke="rgba(201,168,76,.15)" stroke-width=".5"/><text x="200" y="272" text-anchor="middle" font-family="Georgia" font-size="13" fill="rgba(201,168,76,.6)" font-style="italic">Colonial Land Registry · 1898</text></svg>
+      <div class="gallery-tag">Document</div>
+      <div class="gallery-caption">Original colonial land registry documents from 1898</div>
+    </div>
+    <div class="gallery-item">
+      <svg viewBox="0 0 400 300" xmlns="http://www.w3.org/2000/svg"><defs><linearGradient id="ge" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stop-color="#3d1f0a"/><stop offset="100%" stop-color="#6b3e26"/></linearGradient></defs><rect width="400" height="300" fill="url(#ge)"/><circle cx="200" cy="130" r="68" fill="none" stroke="rgba(201,168,76,.4)" stroke-width="1.5"/><circle cx="200" cy="130" r="48" fill="none" stroke="rgba(201,168,76,.24)" stroke-width="1"/><circle cx="200" cy="130" r="5" fill="rgba(201,168,76,.8)"/><line x1="200" y1="62" x2="200" y2="198" stroke="rgba(201,168,76,.2)" stroke-width=".5"/><line x1="132" y1="130" x2="268" y2="130" stroke="rgba(201,168,76,.2)" stroke-width=".5"/><text x="200" y="225" text-anchor="middle" font-family="Georgia" font-size="13" fill="rgba(201,168,76,.6)" font-style="italic">Surveyor's Compass</text></svg>
+      <div class="gallery-tag">Navigation</div>
+      <div class="gallery-caption">A surveyor's compass used in early Perak tin field mapping</div>
+    </div>
+    <div class="gallery-item">
+      <svg viewBox="0 0 400 300" xmlns="http://www.w3.org/2000/svg"><defs><linearGradient id="gf" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stop-color="#0a2b2e"/><stop offset="100%" stop-color="#2a8a92"/></linearGradient></defs><rect width="400" height="300" fill="url(#gf)"/><rect x="80" y="60" width="240" height="180" rx="1" fill="none" stroke="rgba(201,168,76,.4)" stroke-width="1.5"/><rect x="95" y="74" width="210" height="152" fill="rgba(201,168,76,.04)"/><path d="M155,152 Q200,102 245,152" stroke="rgba(201,168,76,.5)" stroke-width="2" fill="none"/><text x="200" y="188" text-anchor="middle" font-family="Georgia" font-size="11" fill="rgba(201,168,76,.5)" font-style="italic">Portrait · Hakka Miner · c.1905</text></svg>
+      <div class="gallery-tag">Portrait</div>
+      <div class="gallery-caption">Photographic portrait of a Hakka mining family, circa 1905</div>
+    </div>
+    <!-- Set 2 — mirror for seamless loop -->
+    <div class="gallery-item" aria-hidden="true"><svg viewBox="0 0 400 300" xmlns="http://www.w3.org/2000/svg"><defs><linearGradient id="ga2" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stop-color="#0d3b3e"/><stop offset="100%" stop-color="#1a5c62"/></linearGradient></defs><rect width="400" height="300" fill="url(#ga2)"/><rect x="30" y="40" width="340" height="220" fill="none" stroke="rgba(201,168,76,.3)" stroke-width="1"/><circle cx="200" cy="120" r="50" fill="none" stroke="rgba(201,168,76,.4)" stroke-width="1"/><text x="200" y="210" text-anchor="middle" font-family="Georgia" font-size="13" fill="rgba(201,168,76,.6)" font-style="italic">Dulang Washing Basin</text></svg><div class="gallery-tag">Collection</div><div class="gallery-caption">A dulang washing basin used by early miners in the Kinta Valley</div></div>
+    <div class="gallery-item" aria-hidden="true"><svg viewBox="0 0 400 300" xmlns="http://www.w3.org/2000/svg"><defs><linearGradient id="gb2" x1="0%" y1="100%" x2="100%" y2="0%"><stop offset="0%" stop-color="#2a1f14"/><stop offset="100%" stop-color="#6b3e26"/></linearGradient></defs><rect width="400" height="300" fill="url(#gb2)"/><rect x="100" y="30" width="200" height="240" fill="none" stroke="rgba(201,168,76,.4)" stroke-width="1.5"/><text x="200" y="110" text-anchor="middle" font-family="Georgia" font-size="22" fill="rgba(201,168,76,.5)" font-style="italic">22</text></svg><div class="gallery-tag">Architecture</div><div class="gallery-caption">The Edwardian facade of 22 Hale Street, meticulously restored</div></div>
+    <div class="gallery-item" aria-hidden="true"><svg viewBox="0 0 400 300" xmlns="http://www.w3.org/2000/svg"><defs><linearGradient id="gc2" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stop-color="#1c1c1c"/><stop offset="100%" stop-color="#0d3b3e"/></linearGradient></defs><rect width="400" height="300" fill="url(#gc2)"/><g transform="translate(200,125)"><polygon points="0,-68 58,34 -58,34" fill="none" stroke="rgba(201,168,76,.5)" stroke-width="1.5"/><circle cx="0" cy="0" r="24" fill="rgba(201,168,76,.1)" stroke="rgba(201,168,76,.4)" stroke-width="1"/></g><text x="200" y="218" text-anchor="middle" font-family="Georgia" font-size="13" fill="rgba(201,168,76,.6)" font-style="italic">Miner's Lamp · c.1910</text></svg><div class="gallery-tag">Artifact</div><div class="gallery-caption">An oil lamp carried by underground miners in the Kinta Valley</div></div>
+    <div class="gallery-item" aria-hidden="true"><svg viewBox="0 0 400 300" xmlns="http://www.w3.org/2000/svg"><defs><linearGradient id="gd2" x1="100%" y1="0%" x2="0%" y2="100%"><stop offset="0%" stop-color="#1a5c62"/><stop offset="100%" stop-color="#0d3b3e"/></linearGradient></defs><rect width="400" height="300" fill="url(#gd2)"/><rect x="60" y="50" width="280" height="200" rx="2" fill="none" stroke="rgba(201,168,76,.3)" stroke-width="1"/><text x="200" y="272" text-anchor="middle" font-family="Georgia" font-size="13" fill="rgba(201,168,76,.6)" font-style="italic">Colonial Land Registry · 1898</text></svg><div class="gallery-tag">Document</div><div class="gallery-caption">Original colonial land registry documents from 1898</div></div>
+    <div class="gallery-item" aria-hidden="true"><svg viewBox="0 0 400 300" xmlns="http://www.w3.org/2000/svg"><defs><linearGradient id="ge2" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stop-color="#3d1f0a"/><stop offset="100%" stop-color="#6b3e26"/></linearGradient></defs><rect width="400" height="300" fill="url(#ge2)"/><circle cx="200" cy="130" r="68" fill="none" stroke="rgba(201,168,76,.4)" stroke-width="1.5"/><circle cx="200" cy="130" r="5" fill="rgba(201,168,76,.8)"/><text x="200" y="225" text-anchor="middle" font-family="Georgia" font-size="13" fill="rgba(201,168,76,.6)" font-style="italic">Surveyor's Compass</text></svg><div class="gallery-tag">Navigation</div><div class="gallery-caption">A surveyor's compass used in early Perak tin field mapping</div></div>
+    <div class="gallery-item" aria-hidden="true"><svg viewBox="0 0 400 300" xmlns="http://www.w3.org/2000/svg"><defs><linearGradient id="gf2" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stop-color="#0a2b2e"/><stop offset="100%" stop-color="#2a8a92"/></linearGradient></defs><rect width="400" height="300" fill="url(#gf2)"/><rect x="80" y="60" width="240" height="180" rx="1" fill="none" stroke="rgba(201,168,76,.4)" stroke-width="1.5"/><text x="200" y="188" text-anchor="middle" font-family="Georgia" font-size="11" fill="rgba(201,168,76,.5)" font-style="italic">Portrait · Hakka Miner · c.1905</text></svg><div class="gallery-tag">Portrait</div><div class="gallery-caption">Photographic portrait of a Hakka mining family, circa 1905</div></div>
+  </div>
+</section>
+
+<!-- ============================================================
+     QUOTE STRIP
+     ============================================================ -->
+<div id="quote-strip" role="blockquote">
+  <p    class="quote-text   reveal" data-i18n="quoteText">"Every stone of this shophouse remembers a story. Every beam carries the weight of a hundred lives."</p>
+  <span class="quote-source reveal reveal-d1" data-i18n="quoteSource">— Heritage Trust of Perak</span>
+</div>
+
+<!-- ============================================================
+     TIMELINE
+     ============================================================ -->
+<section id="timeline" aria-labelledby="tlHeading">
+  <div class="tl-intro">
+    <div class="sec-label reveal" data-i18n="tlLbl">Interactive Timeline</div>
+    <h2 id="tlHeading" class="sec-title reveal reveal-d1" data-i18n="tlTitle">The History of<em> Hale Street</em></h2>
+    <p class="sec-body reveal reveal-d2" style="margin-top:1.5rem" data-i18n="tlDesc">From tin rush to heritage site — a century of stories etched into stone, teak, and memory.</p>
+  </div>
+  <div class="tl-wrap reveal">
+    <div class="tl-spine" aria-hidden="true"></div>
+    <div class="tl-row">
+      <div class="tl-left"><div class="tl-year" data-i18n="t1y">1880s</div></div>
+      <div class="tl-dot-col"><div class="tl-dot" aria-hidden="true"></div></div>
+      <div class="tl-right"><div class="tl-event" data-i18n="t1e">The Tin Rush Begins</div><div class="tl-desc" data-i18n="t1d">The Kinta Valley is revealed as one of the richest tin deposits on earth. Thousands of Hakka and Cantonese miners flood into what will become Ipoh.</div></div>
+    </div>
+    <div class="tl-row">
+      <div class="tl-left"><div class="tl-event" data-i18n="t2e">The Building is Constructed</div><div class="tl-desc" data-i18n="t2d">A prosperous Hakka merchant commissions the shophouse at Hale Street, blending colonial Edwardian architecture with Straits Chinese sensibility.</div></div>
+      <div class="tl-dot-col"><div class="tl-dot" aria-hidden="true"></div></div>
+      <div class="tl-right"><div class="tl-year" data-i18n="t2y">1920s</div></div>
+    </div>
+    <div class="tl-row">
+      <div class="tl-left"><div class="tl-year" data-i18n="t3y">1941</div></div>
+      <div class="tl-dot-col"><div class="tl-dot" aria-hidden="true"></div></div>
+      <div class="tl-right"><div class="tl-event" data-i18n="t3e">The Japanese Occupation</div><div class="tl-desc" data-i18n="t3d">Ipoh falls under Japanese occupation. The shophouse shelters multiple families during three turbulent years. Hidden documents survive within its walls.</div></div>
+    </div>
+    <div class="tl-row">
+      <div class="tl-left"><div class="tl-event" data-i18n="t4e">Independence &amp; New Beginnings</div><div class="tl-desc" data-i18n="t4d">Merdeka brings new energy to Ipoh. The building passes through several hands — a trading house, then a family home — through the boom years.</div></div>
+      <div class="tl-dot-col"><div class="tl-dot" aria-hidden="true"></div></div>
+      <div class="tl-right"><div class="tl-year" data-i18n="t4y">1957</div></div>
+    </div>
+    <div class="tl-row">
+      <div class="tl-left"><div class="tl-year" data-i18n="t5y">2010s</div></div>
+      <div class="tl-dot-col"><div class="tl-dot" aria-hidden="true"></div></div>
+      <div class="tl-right"><div class="tl-event" data-i18n="t5e">The Heritage Project</div><div class="tl-desc" data-i18n="t5d">A dedicated team of preservationists begins the painstaking restoration of 22 Hale Street, recovering original floors, plasterwork, and over 3,500 artifacts.</div></div>
+    </div>
+    <div class="tl-row">
+      <div class="tl-left"><div class="tl-event" data-i18n="t6e">Doors Open to the World</div><div class="tl-desc" data-i18n="t6d">22 Hale Street Heritage Centre opens its doors, welcoming visitors from across Malaysia and the world to experience Ipoh's living memory.</div></div>
+      <div class="tl-dot-col"><div class="tl-dot" aria-hidden="true"></div></div>
+      <div class="tl-right"><div class="tl-year" data-i18n="t6y">Today</div></div>
+    </div>
+  </div>
+</section>
+
+<!-- ============================================================
+     EVENTS
+     ============================================================ -->
+<section id="events" aria-labelledby="evHeading">
+  <div class="sec-label reveal" data-i18n="evLbl">What's On</div>
+  <h2 id="evHeading" class="sec-title reveal reveal-d1" data-i18n="evTitle">Events &amp; <em>Exhibitions</em></h2>
+  <div class="events-grid" style="margin-top:3rem">
+    <div class="event-card reveal">
+      <div class="event-visual">
+        <svg viewBox="0 0 400 175" xmlns="http://www.w3.org/2000/svg"><defs><linearGradient id="ev1" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stop-color="#0d3b3e"/><stop offset="100%" stop-color="#1a5c62"/></linearGradient></defs><rect width="400" height="175" fill="url(#ev1)"/><text x="200" y="90" text-anchor="middle" font-size="48" fill="rgba(201,168,76,.3)">⛏</text><text x="200" y="138" text-anchor="middle" font-family="Georgia" font-size="11" fill="rgba(201,168,76,.5)" font-style="italic">Tin & Toil Exhibition</text></svg>
+        <div class="event-badge"><span class="event-day">12</span><span class="event-mon">Jul</span></div>
+      </div>
+      <div class="event-body">
+        <div class="event-type"  data-i18n="e1t">Permanent Exhibition</div>
+        <div class="event-title" data-i18n="e1h">Tin & Toil: Life in the Kinta Mines</div>
+        <div class="event-desc"  data-i18n="e1d">An immersive reconstruction of a 1920s tin mine, complete with original equipment and first-person oral testimonies.</div>
+      </div>
+    </div>
+    <div class="event-card reveal reveal-d1">
+      <div class="event-visual">
+        <svg viewBox="0 0 400 175" xmlns="http://www.w3.org/2000/svg"><defs><linearGradient id="ev2" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stop-color="#6b3e26"/><stop offset="100%" stop-color="#a0603a"/></linearGradient></defs><rect width="400" height="175" fill="url(#ev2)"/><text x="200" y="90" text-anchor="middle" font-size="48" fill="rgba(201,168,76,.3)">🍵</text><text x="200" y="138" text-anchor="middle" font-family="Georgia" font-size="11" fill="rgba(201,168,76,.5)" font-style="italic">Heritage Craft Workshop</text></svg>
+        <div class="event-badge"><span class="event-day">19</span><span class="event-mon">Jul</span></div>
+      </div>
+      <div class="event-body">
+        <div class="event-type"  data-i18n="e2t">Workshop</div>
+        <div class="event-title" data-i18n="e2h">Batik &amp; Beliefs: A Living Craft</div>
+        <div class="event-desc"  data-i18n="e2d">A hands-on batik workshop guided by a master craftsperson from Perak's oldest textile tradition. All materials provided.</div>
+      </div>
+    </div>
+    <div class="event-card reveal reveal-d2">
+      <div class="event-visual">
+        <svg viewBox="0 0 400 175" xmlns="http://www.w3.org/2000/svg"><defs><linearGradient id="ev3" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stop-color="#1c1c1c"/><stop offset="100%" stop-color="#2a8a92"/></linearGradient></defs><rect width="400" height="175" fill="url(#ev3)"/><text x="200" y="90" text-anchor="middle" font-size="48" fill="rgba(201,168,76,.3)">🎙️</text><text x="200" y="138" text-anchor="middle" font-family="Georgia" font-size="11" fill="rgba(201,168,76,.5)" font-style="italic">Oral History Evening</text></svg>
+        <div class="event-badge"><span class="event-day">26</span><span class="event-mon">Jul</span></div>
+      </div>
+      <div class="event-body">
+        <div class="event-type"  data-i18n="e3t">Community Talk</div>
+        <div class="event-title" data-i18n="e3h">Voices of Old Ipoh</div>
+        <div class="event-desc"  data-i18n="e3d">An intimate evening of oral histories with three Ipoh elders sharing memories of a city that no longer exists — but lives on here.</div>
+      </div>
+    </div>
+  </div>
+  <div style="text-align:center;margin-top:3rem" class="reveal">
+    <button class="btn-outline-dark" onclick="showToast(i18n[currentLang].calToast)" data-i18n="evCta">View Full Calendar</button>
+  </div>
+</section>
+
+<!-- ============================================================
+     VISIT & BOOKING
+     ============================================================ -->
+<section id="visit" aria-labelledby="visHeading">
+  <div class="sec-label reveal" data-i18n="visLbl">Plan Your Visit</div>
+  <h2 id="visHeading" class="sec-title light reveal reveal-d1" data-i18n="visTitle">Come, <em>Experience</em> History</h2>
+  <div class="visit-grid">
+    <div class="reveal reveal-d1">
+      <div class="visit-item"><div class="visit-icon" aria-hidden="true">📍</div><div><div class="visit-lbl" data-i18n="vl1">Location</div><div class="visit-val" data-i18n="vv1"> 22, Jalan Tun Sambanthan,&#10;30000 Ipoh, Perak, Malaysia</div></div></div>
+      <div class="visit-item"><div class="visit-icon" aria-hidden="true">🕐</div><div><div class="visit-lbl" data-i18n="vl2">Opening Hours</div><div class="visit-val" data-i18n="vv2">Wednesday – Sunday: 10:00am – 6:00pm&#10;Closed Mondays&amp;Tuesdays</div></div></div>
+      <div class="visit-item"><div class="visit-icon" aria-hidden="true">🎟️</div><div><div class="visit-lbl" data-i18n="vl3">Admission</div><div class="visit-val" data-i18n="vv3">RM 15 per person</div></div></div>
+      <div class="visit-item"><div class="visit-icon" aria-hidden="true">🚗</div><div><div class="visit-lbl" data-i18n="vl4">Getting Here</div><div class="visit-val" data-i18n="vv4">10 min walk from Ipoh Old Town.&#10;Street parking on Jalan Dato Tahwil Azar.</div></div></div>
+      <div class="visit-item"><div class="visit-icon" aria-hidden="true">📞</div><div><div class="visit-lbl" data-i18n="vl5">Contact</div><div class="visit-val" data-i18n="vv5">halestreetipoh@gmail.com&#10;(+60) 12 626 8069</div></div></div>
+      <!-- Accessibility info (new — all world-class museums show this) -->
+      <div class="visit-item">
+        <div class="visit-icon" aria-hidden="true">♿</div>
+        <div>
+          <div class="visit-lbl">Accessibility</div>
+          <div class="visit-val">Lift access to all floors. Tactile guide maps available. Wheelchair-accessible entrance via rear lane.</div>
+        </div>
+      </div>
+    </div>
+    <div class="book-form reveal reveal-d2" role="form" aria-label="Tour booking form">
+      <div class="form-title" data-i18n="fTitle">Book a Guided Tour</div>
+      <div class="form-sub"   data-i18n="fSub">Tours run daily at 10:00am and 2:00pm</div>
+      <div class="form-2col">
+        <div class="form-row"><label class="form-lbl" data-i18n="fFN">First Name</label><input type="text" class="form-in" placeholder="Ahmad" autocomplete="given-name"/></div>
+        <div class="form-row"><label class="form-lbl" data-i18n="fLN">Last Name</label><input type="text" class="form-in" placeholder="Ibrahim" autocomplete="family-name"/></div>
+      </div>
+      <div class="form-row"><label class="form-lbl" data-i18n="fEM">Email Address</label><input type="email" class="form-in" placeholder="your@email.com" autocomplete="email"/></div>
+      <div class="form-2col">
+        <div class="form-row"><label class="form-lbl" data-i18n="fDT">Preferred Date</label><input type="date" class="form-in"/></div>
+        <div class="form-row"><label class="form-lbl" data-i18n="fTM">Tour Time</label><select class="form-sel"><option>10:00am</option><option>2:00pm</option></select></div>
+      </div>
+      <div class="form-row">
+        <label class="form-lbl" data-i18n="fGU">Number of Guests</label>
+        <select class="form-sel">
+          <option data-i18n="fg1">1 person</option>
+          <option data-i18n="fg2">2 people</option>
+          <option data-i18n="fg3">3–5 people</option>
+          <option data-i18n="fg4">6–10 people</option>
+          <option data-i18n="fg5">School / Group (10+)</option>
+        </select>
+      </div>
+      <button class="form-submit" onclick="handleBook(event)" data-i18n="fBtn">Reserve My Spot →</button>
+      <div class="form-note" data-i18n="fNote">Free cancellation up to 24 hours before your tour</div>
+    </div>
+  </div>
+</section>
+
+<!-- ============================================================
+     SHOP
+     ============================================================ -->
+<section id="shop" aria-labelledby="shHeading">
+  <div class="shop-visual reveal">
+    <div class="shop-frame">
+      <svg viewBox="0 0 400 530" xmlns="http://www.w3.org/2000/svg">
+        <defs><linearGradient id="sh1" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stop-color="#0d3b3e"/><stop offset="100%" stop-color="#1a5c62"/></linearGradient></defs>
+        <rect width="400" height="530" fill="url(#sh1)"/>
+        <rect x="28" y="78"  width="344" height="6" rx="2" fill="rgba(201,168,76,.42)"/>
+        <rect x="28" y="218" width="344" height="6" rx="2" fill="rgba(201,168,76,.42)"/>
+        <rect x="28" y="360" width="344" height="6" rx="2" fill="rgba(201,168,76,.42)"/>
+        <rect x="48"  y="28" width="22" height="50" fill="rgba(201,168,76,.5)"/>
+        <rect x="74"  y="18" width="18" height="60" fill="rgba(201,168,76,.32)"/>
+        <rect x="96"  y="32" width="24" height="46" fill="rgba(201,168,76,.44)"/>
+        <rect x="124" y="22" width="16" height="56" fill="rgba(201,168,76,.22)"/>
+        <rect x="198" y="26" width="22" height="52" fill="rgba(201,168,76,.38)"/>
+        <rect x="224" y="16" width="18" height="62" fill="rgba(201,168,76,.26)"/>
+        <rect x="246" y="30" width="26" height="48" fill="rgba(201,168,76,.5)"/>
+        <rect x="276" y="20" width="20" height="58" fill="rgba(201,168,76,.32)"/>
+        <circle cx="80"  cy="156" r="34" fill="none" stroke="rgba(201,168,76,.42)" stroke-width="1.5"/>
+        <circle cx="80"  cy="156" r="14" fill="rgba(201,168,76,.16)"/>
+        <rect   x="150" y="126" width="50" height="80" rx="2" fill="none" stroke="rgba(201,168,76,.42)" stroke-width="1.5"/>
+        <text   x="175" y="172" text-anchor="middle" font-family="Georgia" font-size="22" fill="rgba(201,168,76,.42)">22</text>
+        <circle cx="290" cy="156" r="28" fill="rgba(201,168,76,.1)" stroke="rgba(201,168,76,.52)" stroke-width="1"/>
+        <line   x1="262" y1="156" x2="318" y2="156" stroke="rgba(201,168,76,.42)" stroke-width="1"/>
+        <line   x1="290" y1="128" x2="290" y2="184" stroke="rgba(201,168,76,.42)" stroke-width="1"/>
+        <rect x="44"  y="237" width="90"  height="112" rx="1" fill="rgba(201,168,76,.08)" stroke="rgba(201,168,76,.3)"  stroke-width="1"/>
+        <rect x="154" y="245" width="90"  height="104" rx="1" fill="rgba(201,168,76,.12)" stroke="rgba(201,168,76,.36)" stroke-width="1"/>
+        <rect x="264" y="237" width="90"  height="112" rx="1" fill="rgba(201,168,76,.07)" stroke="rgba(201,168,76,.25)" stroke-width="1"/>
+        <text x="200" y="416" text-anchor="middle" font-family="Georgia" font-size="14" fill="rgba(201,168,76,.62)" font-style="italic">Heritage Books &amp; Crafts</text>
+        <text x="200" y="442" text-anchor="middle" font-family="sans-serif" font-size="9" fill="rgba(255,255,255,.22)" letter-spacing="2">IPOH · PERAK</text>
+      </svg>
+    </div>
+    <div class="shop-badge">
+      <span class="shop-badge-title" data-i18n="shopBadge">The Heritage Shop</span>
+      <span class="shop-badge-sub">22 Hale Street</span>
+    </div>
+  </div>
+  <div class="reveal reveal-d1">
+    <div class="sec-label" data-i18n="shLbl" style="color:var(--gold-light)">The Shop</div>
+    <h2 id="shHeading" class="sec-title" data-i18n="shTitle" style="color:var(--cream)">Heritage <em>Souvenirs</em></h2>
+    <div class="ornament" aria-hidden="true">
+      <div class="ornament-line" style="background:linear-gradient(to right,transparent,rgba(201,168,76,.5),transparent)"></div>
+      <div class="ornament-diamond"></div>
+      <div class="ornament-line" style="background:linear-gradient(to right,transparent,rgba(201,168,76,.5),transparent)"></div>
+    </div>
+    <p class="sec-body" style="color:rgba(248,243,234,.65)" data-i18n="shP1">Our heritage shop curates locally made crafts, signed books on Perak history, and limited-edition prints — all sourced from Ipoh's most talented makers.</p>
+    <p class="sec-body" style="color:rgba(248,243,234,.65);margin-top:1rem" data-i18n="shP2">Every purchase supports local artisans and helps fund the ongoing preservation of 22 Hale Street.</p>
+    <div class="shop-tags" role="list" aria-label="Shop categories">
+      <span class="shop-tag" role="listitem" data-i18n="st1">Ipoh Crafts</span>
+      <span class="shop-tag" role="listitem" data-i18n="st2">Heritage Books</span>
+      <span class="shop-tag" role="listitem" data-i18n="st3">Local Prints</span>
+      <span class="shop-tag" role="listitem" data-i18n="st4">Tin Art</span>
+      <span class="shop-tag" role="listitem" data-i18n="st5">Postcards</span>
+      <span class="shop-tag" role="listitem" data-i18n="st6">Accessories</span>
+    </div>
+    <div class="shop-actions">
+      <button class="btn-gold" onclick="showToast(i18n[currentLang].shopToast)" data-i18n="shCta">Browse the Shop</button>
+    </div>
+  </div>
+</section>
+
+<!-- ============================================================
+     NEWSLETTER (new — every world-class museum has this.
+     Louvre, Met, British Museum all use email capture to build
+     audience and announce events.)
+     ============================================================ -->
+<section id="newsletter" aria-labelledby="nlHeading">
+  <div class="nl-inner reveal">
+    <div class="nl-deco" aria-hidden="true">✦</div>
+    <h2 id="nlHeading" class="nl-title" data-i18n="nlTitle">Stay Connected to Ipoh's Heritage</h2>
+    <p class="nl-sub" data-i18n="nlSub">Monthly stories, event announcements, and archival discoveries — straight to your inbox.</p>
+    <form class="nl-form" onsubmit="handleNewsletter(event)" novalidate>
+      <div class="nl-row">
+        <input
+          type="email"
+          class="nl-input"
+          required
+          data-i18n-placeholder="nlPlaceholder"
+          placeholder="Your email address"
+          autocomplete="email"
+          aria-label="Email address for newsletter"
+        />
+        <button type="submit" class="nl-btn" data-i18n="nlBtn">Subscribe</button>
+      </div>
+      <p class="nl-note" data-i18n="nlNote">No spam. Unsubscribe any time.</p>
+    </form>
+  </div>
+</section>
+
+<!-- ============================================================
+     BLOG
+     ============================================================ -->
+<section id="blog" aria-labelledby="blHeading">
+  <div class="sec-label reveal" data-i18n="blLbl">Stories &amp; Archive</div>
+  <h2 id="blHeading" class="sec-title reveal reveal-d1" data-i18n="blTitle">From Our <em>Blog</em></h2>
+  <div class="blog-grid">
+    <div class="blog-card featured reveal">
+      <div class="blog-img"><svg viewBox="0 0 600 374" xmlns="http://www.w3.org/2000/svg"><defs><linearGradient id="bl1" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stop-color="#0d3b3e"/><stop offset="100%" stop-color="#1a5c62"/></linearGradient></defs><rect width="600" height="374" fill="url(#bl1)"/><text x="300" y="174" text-anchor="middle" font-size="72" fill="rgba(201,168,76,.2)">⛏️</text><text x="300" y="248" text-anchor="middle" font-family="Georgia" font-size="16" fill="rgba(201,168,76,.5)" font-style="italic">The Dulang Washers of Kinta</text></svg></div>
+      <div class="blog-body"><div class="blog-cat" data-i18n="b1c">Oral History</div><div class="blog-title" data-i18n="b1t">The Last Dulang Washers: Stories From the Kinta Valley</div><div class="blog-meta" data-i18n="b1m">By Lim Mei Ling · 15 June 2025 · 8 min read</div></div>
+    </div>
+    <div class="blog-card reveal reveal-d1">
+      <div class="blog-img"><svg viewBox="0 0 300 188" xmlns="http://www.w3.org/2000/svg"><defs><linearGradient id="bl2" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stop-color="#2a1f14"/><stop offset="100%" stop-color="#6b3e26"/></linearGradient></defs><rect width="300" height="188" fill="url(#bl2)"/><text x="150" y="104" text-anchor="middle" font-size="52" fill="rgba(201,168,76,.25)">🏛️</text></svg></div>
+      <div class="blog-body"><div class="blog-cat" data-i18n="b2c">Architecture</div><div class="blog-title" data-i18n="b2t">Five-Foot Ways: Ipoh's Unsung Urban Design</div><div class="blog-meta" data-i18n="b2m">By Raja Azman · 2 June 2025</div></div>
+    </div>
+    <div class="blog-card reveal reveal-d2">
+      <div class="blog-img"><svg viewBox="0 0 300 188" xmlns="http://www.w3.org/2000/svg"><defs><linearGradient id="bl3" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stop-color="#0a2b2e"/><stop offset="100%" stop-color="#2a8a92"/></linearGradient></defs><rect width="300" height="188" fill="url(#bl3)"/><text x="150" y="104" text-anchor="middle" font-size="52" fill="rgba(201,168,76,.25)">📜</text></svg></div>
+      <div class="blog-body"><div class="blog-cat" data-i18n="b3c">History</div><div class="blog-title" data-i18n="b3t">How the Siamese Cession Shaped Modern Perak</div><div class="blog-meta" data-i18n="b3m">By Dr. Tan Siew Khim · 20 May 2025</div></div>
+    </div>
+  </div>
+  <div style="text-align:center;margin-top:3rem" class="reveal">
+    <button class="btn-outline-dark" onclick="showToast(i18n[currentLang].blogToast)" data-i18n="blCta">Read All Stories</button>
+  </div>
+</section>
+
+<!-- ============================================================
+     INSTAGRAM
+     ============================================================ -->
+<section id="instagram" aria-label="Instagram feed">
+  <span  class="ig-eyebrow" data-i18n="igHash">#22HaleStreet</span>
+  <h2    class="ig-title"    data-i18n="igTitle">Share Your <em>Visit</em></h2>
+  <div   class="ig-handle"   data-i18n="igHandle">Tag us @22halestreet on Instagram</div>
+  <div class="ig-grid" role="list">
+    <div class="ig-cell" role="listitem"><svg viewBox="0 0 150 150" xmlns="http://www.w3.org/2000/svg"><rect width="150" height="150" fill="#1a5c62"/><text x="75" y="82" text-anchor="middle" font-size="42">🏛️</text></svg><div class="ig-overlay" aria-hidden="true">♡</div></div>
+    <div class="ig-cell" role="listitem"><svg viewBox="0 0 150 150" xmlns="http://www.w3.org/2000/svg"><rect width="150" height="150" fill="#6b3e26"/><text x="75" y="82" text-anchor="middle" font-size="42">⛏️</text></svg><div class="ig-overlay" aria-hidden="true">♡</div></div>
+    <div class="ig-cell" role="listitem"><svg viewBox="0 0 150 150" xmlns="http://www.w3.org/2000/svg"><rect width="150" height="150" fill="#0d3b3e"/><text x="75" y="82" text-anchor="middle" font-size="42">🗝️</text></svg><div class="ig-overlay" aria-hidden="true">♡</div></div>
+    <div class="ig-cell" role="listitem"><svg viewBox="0 0 150 150" xmlns="http://www.w3.org/2000/svg"><rect width="150" height="150" fill="#2a8a92"/><text x="75" y="82" text-anchor="middle" font-size="42">📸</text></svg><div class="ig-overlay" aria-hidden="true">♡</div></div>
+    <div class="ig-cell" role="listitem"><svg viewBox="0 0 150 150" xmlns="http://www.w3.org/2000/svg"><rect width="150" height="150" fill="#3d1f0a"/><text x="75" y="82" text-anchor="middle" font-size="42">🪔</text></svg><div class="ig-overlay" aria-hidden="true">♡</div></div>
+    <div class="ig-cell" role="listitem"><svg viewBox="0 0 150 150" xmlns="http://www.w3.org/2000/svg"><rect width="150" height="150" fill="#1c1c1c"/><text x="75" y="82" text-anchor="middle" font-size="42">🗺️</text></svg><div class="ig-overlay" aria-hidden="true">♡</div></div>
+  </div>
+</section>
+
+<!-- ============================================================
+     FOOTER
+     ============================================================ -->
+<footer role="contentinfo">
+  <div class="footer-top">
+    <div>
+      <div class="footer-logo">
+        <img src="logo.png" alt="22 Hale Street Heritage Centre"
+             onerror="this.style.display='none'; document.getElementById('footerLogoFallback').style.display='block'"/>
+        <div id="footerLogoFallback" class="footer-logo-fallback" style="display:none">22</div>
+      </div>
+      <p class="footer-tagline" data-i18n="ftTag">A living archive of Ipoh's tin mining era, immigrant heritage, and the architecture that made a city.</p>
+    </div>
+    <div>
+      <div class="footer-col-title" data-i18n="ftEx">Explore</div>
+      <ul class="footer-links">
+        <li><a href="#museum"   data-i18n="fl1">The Museum</a></li>
+        <li><a href="#gallery"  data-i18n="fl2">Virtual Gallery</a></li>
+        <li><a href="#timeline" data-i18n="fl3">Our History</a></li>
+        <li><a href="#events"   data-i18n="fl4">Exhibitions</a></li>
+        <li><a href="#blog"     data-i18n="fl5">Stories</a></li>
+      </ul>
+    </div>
+    <div>
+      <div class="footer-col-title" data-i18n="ftVs">Visit</div>
+      <ul class="footer-links">
+        <li><a href="#visit"  data-i18n="fl6">Book a Tour</a></li>
+        <li><a href="#visit"  data-i18n="fl7">Opening Hours</a></li>
+        <li><a href="#visit"  data-i18n="fl8">Location</a></li>
+        <li><a href="#shop"   data-i18n="fl9">Shop</a></li>
+        <li><a href="#events" data-i18n="fl10">Events</a></li>
+      </ul>
+    </div>
+    <div>
+      <div class="footer-col-title" data-i18n="ftCn">Contact</div>
+      <ul class="footer-links">
+        <li><a href="mailto:halestreetipoh@gmail.com">halestreetipoh@gmail.com</a></li>
+        <li><a href="tel:(+60) 12 626 8069">(+60) 12 626 8069</a></li>
+      </ul>
+    </div>
+  </div>
+  <div class="footer-bottom">
+    <div class="footer-copy" data-i18n="ftCopy">© 2026 22 Hale Street Heritage Centre · Ipoh, Perak · All rights reserved</div>
+    <div class="footer-social" aria-label="Social media links">
+      <a href="#" title="Instagram" aria-label="Visit our Instagram">IG</a>
+      <a href="#" title="Facebook"  aria-label="Visit our Facebook">FB</a>
+      <a href="#" title="X"         aria-label="Visit our X / Twitter">𝕏</a>
+    </div>
+  </div>
+</footer>
+
+<!-- ============================================================
+     BOOKING MODAL
+     ============================================================ -->
+<div class="modal-overlay" id="bookModal" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
+  <div class="modal">
+    <button class="modal-close" onclick="closeModal()" aria-label="Close booking modal">×</button>
+    <div class="modal-title" id="modalTitle" data-i18n="mdTitle">Reserve Your Tour</div>
+    <div class="modal-body" data-i18n="mdBody">Complete your booking via email or phone and our team will confirm within 24 hours.</div>
+    <div style="display:flex;gap:1rem;margin-top:1rem">
+      <a href="mailto:halestreetipoh@gmail.com?subject=Tour Booking" class="btn-gold"          data-i18n="mdEmail">Email Us</a>
+      <a href="tel:(+60) 12 626 8069"                                   class="btn-outline-light" data-i18n="mdCall">Call Us</a>
+    </div>
+  </div>
+</div>
+
+<!-- ============================================================
+     FIXED LANGUAGE SWITCHER (bottom-left)
+     FIX: Added data-lang attributes here too
+     ============================================================ -->
+<div class="lang-fixed" role="group" aria-label="Language selection">
+  <button class="lang-btn active" data-lang="en" onclick="switchLang('en')">EN</button>
+  <button class="lang-btn"        data-lang="ms" onclick="switchLang('ms')">BM</button>
+  <button class="lang-btn"        data-lang="zh" onclick="switchLang('zh')">中</button>
+</div>
+
+<div id="toast" role="status" aria-live="polite" aria-atomic="true"></div>
+
+<!-- JavaScript — loaded last so DOM is ready -->
+<script src="script.js"></script>
+</body>
+</html>
